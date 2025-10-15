@@ -25,10 +25,7 @@ RUN useradd -ms /bin/bash springuser
 USER springuser
 
 # ค้นหาไฟล์ .jar ล่าสุดจากสเตจ build แล้วคัดลอกเข้ามา
-COPY --from=build /app/target/*-SNAPSHOT.jar app.jar
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
-    CMD wget -qO- http://localhost:8080/actuator/health | grep -q '"status":"UP"' || exit 1
+COPY --from=build /app/target/springboot-example-images.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]
