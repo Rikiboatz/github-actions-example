@@ -10,9 +10,15 @@ name: Project CICD Flows
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: 
+      - main
+  # Optional: Allows manual trigger from the GitHub UI
+  workflow_dispatch:
+
+env:
+  # Customize these variables
+  JAVA_VERSION: '21'
+  APP_NAME: 'github-actions-example' # Used as the Docker image name
 
 jobs:
   build:
@@ -20,13 +26,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: 📦 Checkout code
       uses: actions/checkout@v4
-    - name: Set up JDK 21
+
+    # --- 1. JAVA BUILD STAGE (Assuming Maven) ---
+    - name: ⚙️ Set up JDK ${{ env.JAVA_VERSION }}
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn clean install
+    - name: 🛠️ Build Java Application (Maven)
+      run: mvn clean package -DskipTests
+
+    - name: Build & push Docker image
+      uses: mr-smithers-excellent/docker-build-push@v5
+      with:
+        image: rikiboat/springboot-example-images
+        tags: latest
+        registry: docker.io
+        dockerfile: Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
