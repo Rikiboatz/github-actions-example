@@ -15,6 +15,7 @@ public class GithubCicdActionsApplication {
 		return "Welcome to my application!";
 	}
 	
+	// update
 
 	public static void main(String[] args) {
 		SpringApplication.run(GithubCicdActionsApplication.class, args);
