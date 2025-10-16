@@ -26,18 +26,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📦 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
 
     # --- 1. JAVA BUILD STAGE (Assuming Maven) ---
-    - name: ⚙️ Set up JDK ${{ env.JAVA_VERSION }}
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
       uses: actions/setup-java@v4
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
         cache: maven
-    - name: 🛠️ Build Java Application (Maven)
-      run: mvn clean package -DskipTests
+
+    - name: Build Java Application (Maven)
+      #run: mvn clean package -DskipTests
+      run: mvn clean install
 
     - name: Build & push Docker image
       uses: mr-smithers-excellent/docker-build-push@v5
