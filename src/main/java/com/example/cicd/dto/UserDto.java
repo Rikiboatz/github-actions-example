@@ -1,7 +1,5 @@
 package com.example.cicd.dto;
 
-import com.example.cicd.entity.User;
-
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
