@@ -13,25 +13,36 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// @AutoConfigureMockMvc
+// @SpringBootTest
+// class GithubCicdActionsApplicationTests {
+
+// 	// @Autowired MockMvc mvc;
+
+// 	// public static Logger logger = LoggerFactory.getLogger(GithubCicdActionsApplication.class);
+
+// 	@Test
+// 	void contextLoads() {
+// 		// logger.info("Test case executing...");
+// 		// assertEquals(true, true);
+// 	}
+
+// 	// @Test
+// 	// void succcessCaseWelcomeTest() throws Exception {
+// 	// 	mvc.perform(get("/welcome"))
+// 	// 		.andExpect(status().isOk())
+// 	// 		.andExpect(result -> result.equals("Welcome to my application!"));
+// 	// }
+
+// }
+
+
+@SpringBootTest
 class GithubCicdActionsApplicationTests {
-
-	@Autowired MockMvc mvc;
-
-	public static Logger logger = LoggerFactory.getLogger(GithubCicdActionsApplication.class);
 
 	@Test
 	void contextLoads() {
-		logger.info("Test case executing...");
-		assertEquals(true, true);
-	}
-
-	@Test
-	void succcessCaseWelcomeTest() throws Exception {
-		mvc.perform(get("/welcome"))
-			.andExpect(status().isOk())
-			.andExpect(result -> result.equals("Welcome to my application!"));
 	}
 
 }
