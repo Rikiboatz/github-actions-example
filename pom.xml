@@ -74,6 +74,7 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${postgresql.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 		<!-- JUnit Jupiter for testing -->
 		<dependency>
