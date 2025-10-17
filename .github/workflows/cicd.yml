@@ -19,8 +19,8 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_DB: appdb
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: P@ssw0rd
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: secret
         ports:
           - 5432:5432
         options: >-
