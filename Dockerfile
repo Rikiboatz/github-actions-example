@@ -27,5 +27,8 @@ USER springuser
 # ค้นหาไฟล์ .jar ล่าสุดจากสเตจ build แล้วคัดลอกเข้ามา
 COPY --from=build /app/target/springboot-example-images.jar app.jar
 
+# ใช้ prod profile ตอนรันจริง; ปรับได้ตาม infra ของคุณ
+# ENV SPRING_PROFILES_ACTIVE=prod
+
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]

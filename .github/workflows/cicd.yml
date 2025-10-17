@@ -70,6 +70,6 @@ jobs:
           push: true
           tags: |
             ${{ env.IMAGE_REPO }}:latest
-            ${{ env.IMAGE_REPO }}:${{ github.sha }}
+   #         ${{ env.IMAGE_REPO }}:${{ github.sha }}
           build-args: |
             JAR_FILE=target/*.jar
