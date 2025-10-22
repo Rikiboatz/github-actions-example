@@ -2,7 +2,7 @@ name: Project CICD Flows
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]  # ให้ทำงานเมื่อมีการ push ไปที่ branch main
   workflow_dispatch:
 
 env:
@@ -67,11 +67,9 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          push: true
+          push: true  # ตั้งค่าเป็น true เพื่อส่ง Image ขึ้น Registry
           tags: |
             ${{ env.IMAGE_REPO }}:latest
    #         ${{ env.IMAGE_REPO }}:${{ github.sha }}
           build-args: |
             JAR_FILE=target/*.jar
-      - name: Build Docker Compose services
-        run: docker-compose up --build
