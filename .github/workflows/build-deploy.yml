@@ -21,7 +21,7 @@ env:
   # GHCR
   REGISTRY: ghcr.io
   IMAGE_NAME: ghcr.io/${{ github.repository }}           # ตัวอย่าง: ghcr.io/owner/repo
-  APP_NAME: app                                           # ชื่อคอนเทนเนอร์ที่จะรันบนเครื่องปลายทาง
+  APP_NAME: 'github-actions-example'                     # ชื่อคอนเทนเนอร์ที่จะรันบนเครื่องปลายทาง
   # Java
   JAVA_VERSION: '21'
 
@@ -108,5 +108,96 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # ถ้าโปรเจกต์เป็น multi-module หรือมีไฟล์ Dockerfile อยู่ที่ path อื่น ให้ตั้งค่า:
-          # file: ./Dockerfile
+
+  
+  deploy-to-server:
+    name: Deploy to Remote Docker Host
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+    steps:
+      - name: Pull & Run latest image on remote (via SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}         # eg. 203.0.113.10
+          username: ${{ secrets.SSH_USER }}     # eg. ubuntu
+          key: ${{ secrets.SSH_KEY }}           # private key ของ user บนเครื่องปลายทาง
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            echo "Login GHCR (read token) ..."
+            echo "${{ secrets.GHCR_READ_TOKEN }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.GHCR_USER }}" --password-stdin
+
+            IMAGE="${{ env.IMAGE_NAME }}:latest"
+
+            echo "Pull latest image: ${IMAGE}"
+            docker pull "${IMAGE}"
+
+            echo "Stop & remove old container if exists ..."
+            if [ "$(docker ps -aq -f name=^/${{ env.APP_NAME }}$)" ]; then
+              docker rm -f "${{ env.APP_NAME }}" || true
+            fi
+
+            # ไฟล์ .env บนเครื่องปลายทาง (ถ้ามี)
+            ENV_FILE_PATH="${{ secrets.ENV_FILE_PATH }}"   # เช่น /opt/${{ env.APP_NAME }}/.env (สร้างและเก็บ secrets บนเครื่องเอง)
+
+            echo "Run new container ..."
+            docker run -d \
+              --name "${{ env.APP_NAME }}" \
+              --restart unless-stopped \
+              -p ${{ secrets.APP_PORT }}:${{ secrets.APP_PORT_INTERNAL }} \
+              ${ENV_FILE_PATH:+--env-file "$ENV_FILE_PATH"} \
+              "${IMAGE}"
+
+            echo "Deployed container:"
+            docker ps --filter "name=${{ env.APP_NAME }}"
+
+  compose-build-from-repo:
+    name: Compose Build from Docker Repository (Remote)
+    runs-on: ubuntu-latest
+    needs: deploy-to-server
+    steps:
+      - name: Prepare & run docker compose on remote (via SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            # ====== ตั้งค่า repo/dir/compose file บนเครื่องปลายทาง ======
+            REPO_URL="${{ secrets.DOCKER_STACK_REPO }}"     # ex: https://github.com/your-org/your-docker-stack.git
+            STACK_DIR="${{ secrets.DOCKER_STACK_DIR }}"     # ex: /opt/docker-stacks/your-stack
+            COMPOSE_FILE="${{ secrets.COMPOSE_FILE }}"      # ex: docker-compose.yml
+
+            # ====== เตรียมโฟลเดอร์และโคลน/อัปเดต repo ======
+            mkdir -p "$(dirname "$STACK_DIR")"
+            if [ -d "$STACK_DIR/.git" ]; then
+              echo "Pull latest docker stack repo ..."
+              git -C "$STACK_DIR" fetch --all --prune
+              git -C "$STACK_DIR" reset --hard origin/main
+            else
+              echo "Clone docker stack repo ..."
+              git clone "$REPO_URL" "$STACK_DIR"
+            fi
+
+            cd "$STACK_DIR"
+
+            # (ตัวเลือก) Login GHCR เพื่อดึง image จาก compose
+            echo "${{ secrets.GHCR_READ_TOKEN }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.GHCR_USER }}" --password-stdin
+
+            # ====== Compose build/pull/up ======
+            if [ -f "$COMPOSE_FILE" ]; then
+              echo "Run docker compose with $COMPOSE_FILE"
+              docker compose -f "$COMPOSE_FILE" pull || true
+              docker compose -f "$COMPOSE_FILE" build
+              docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
+              docker compose -f "$COMPOSE_FILE" ps
+            else
+              echo "ERROR: compose file not found: $COMPOSE_FILE" >&2
+              exit 1
+            fi

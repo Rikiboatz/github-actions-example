@@ -14,12 +14,13 @@ services:
       retries: 10
 
   app:
-    image: rikiboat/springboot-example-images:latest
+    image: ghcr.io/rikiboatz/github-actions-example:sha-10a8edb
     depends_on:
       db:
         condition: service_healthy
     environment:
-                # ใช้ prod profile
+    
+      # ใช้ prod profile
       SPRING_PROFILES_ACTIVE: prod
 
       # JDBC (สำคัญ: ขึ้นต้น jdbc:)
@@ -29,13 +30,13 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
 
-                # กันสตาร์ทพังถ้า DB ยังไม่พร้อม 1st time
+      # กันสตาร์ทพังถ้า DB ยังไม่พร้อม 1st time
       SPRING_DATASOURCE_HIKARI_INITIALIZATIONFAILTIMEOUT: "0"
       
-                # เผื่อในไฟล์ prod.yml เคยตั้ง dialect ไว้ผิด/ทับค่า
+      # เผื่อในไฟล์ prod.yml เคยตั้ง dialect ไว้ผิด/ทับค่า
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
 
-                # เปิด log เพื่อไล่ปัญหา
+      # เปิด log เพื่อไล่ปัญหา
       LOGGING_LEVEL_ORG_HIBERNATE_SQL: debug
       LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER: trace
     ports:
