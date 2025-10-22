@@ -23,7 +23,7 @@ env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}           # ตัวอย่าง: ghcr.io/owner/repo
   APP_NAME: app                                           # ชื่อคอนเทนเนอร์ที่จะรันบนเครื่องปลายทาง
   # Java
-  JAVA_VERSION: "21"
+  JAVA_VERSION: '21'
 
 jobs:
   build-test:
