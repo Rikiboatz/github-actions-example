@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d appdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: rikiboat/springboot-example-images:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+                # ใช้ prod profile
+      SPRING_PROFILES_ACTIVE: prod
+
+      # JDBC (สำคัญ: ขึ้นต้น jdbc:)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/appdb
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+                # กันสตาร์ทพังถ้า DB ยังไม่พร้อม 1st time
+      SPRING_DATASOURCE_HIKARI_INITIALIZATIONFAILTIMEOUT: "0"
+      
+                # เผื่อในไฟล์ prod.yml เคยตั้ง dialect ไว้ผิด/ทับค่า
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+                # เปิด log เพื่อไล่ปัญหา
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: debug
+      LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER: trace
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
