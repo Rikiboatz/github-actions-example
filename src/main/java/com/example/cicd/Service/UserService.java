@@ -103,23 +103,23 @@ public class UserService implements InnerUserService {
 
 
     private boolean verifyIsCreated(CreateUserRequest request) {
-        if (StringUtil.isValidUsername(request.username())) {
+        if (!StringUtil.isValidUsername(request.username())) {
             System.out.println("Invalid username");
             return false;
         }
 
-        if (StringUtil.isValidPassword(request.password())) {
+        if (!StringUtil.isValidPassword(request.password())) {
             System.out.println("Invalid password");
             return false;
         }
 
-        if (StringUtil.isValidEmail(request.email())) {
+        if (!StringUtil.isValidEmail(request.email())) {
             System.out.println("Invalid email");
             return false;
         }
 
         if (StringUtils.isNotBlank(request.mobileNo()) 
-            && StringUtil.isValidMobileNo(request.mobileNo())) {
+            && !StringUtil.isValidMobileNo(request.mobileNo())) {
             System.out.println("Invalid mobile no");
             return false;
         }
