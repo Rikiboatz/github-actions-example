@@ -30,5 +30,5 @@ COPY --from=build /app/target/springboot-example-images.jar app.jar
 # ใช้ prod profile ตอนรันจริง; ปรับได้ตาม infra ของคุณ
 # ENV SPRING_PROFILES_ACTIVE=prod
 
-EXPOSE 8080
+EXPOSE 9000
 ENTRYPOINT ["java","-jar","/app/app.jar"]
