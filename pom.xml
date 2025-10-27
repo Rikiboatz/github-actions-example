@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.6</version>
+		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
@@ -36,10 +36,12 @@
 		<junit.jupiter.version>5.10.2</junit.jupiter.version>
 		<slf4j.simple.version>2.0.13</slf4j.simple.version>
 		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
-		<spring-security-crypto.version>6.1.5</spring-security-crypto.version>
+		<spring-security-crypto.version>6.2.0</spring-security-crypto.version>
 		<!-- Upgraded to 6.2.x to align with Spring Boot 3.5.x compatibility -->
 		<spring-security-crypto.version>6.2.0</spring-security-crypto.version>
 		<maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+		<wiremock-standalone.version>3.13.1</wiremock-standalone.version>
+		<restassured.version>5.5.6</restassured.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -69,39 +71,46 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
 		</dependency>
 		<!-- PostgreSQL JDBC Driver -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>${postgresql.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- JUnit Jupiter for testing -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>${junit.jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- Jakarta Validation API for bean validation -->
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>${jakarta.validation-api.version}</version>
 		</dependency>
 		<!-- Spring Security Crypto for password encoding -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-crypto</artifactId>
-			<version>${spring-security-crypto.version}</version> 
+			<artifactId>spring-security-crypto</artifactId> 
 		</dependency>
 		<!-- SLF4J Simple for logging in tests -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.simple.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- REST Assured for testing RESTful services -->
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Mocking HTTP server for testing -->
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>${wiremock-standalone.version}</version>  <!-- เวอร์ชันล่าสุดเสถียร ณ ตอนนี้ -->
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -115,7 +124,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 				<useSystemClassLoader>true</useSystemClassLoader>
 				<includes>
@@ -126,7 +134,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>3.2.5</version>
 			</plugin>
 		</plugins>
 		<finalName>springboot-example-images</finalName>
